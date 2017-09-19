@@ -10,6 +10,6 @@
 
 @interface ViewController : UIViewController
 
-
+@property(nonatomic,strong)NSMutableArray *tasks;
 @end
 
