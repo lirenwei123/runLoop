@@ -311,6 +311,7 @@
 				FBCE53D61F71721E008F5CF2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
