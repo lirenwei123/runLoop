@@ -38,18 +38,21 @@ typedef void(^runLoopBlock)();
 
 -(void)addRunloopObserver{
     CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
-//    CFRunLoopObserverContext contex = {
-//        0,
-//        (__bridge void *)self,
-//        &CFRetain,
-//        &CFRelease,
-//        NULL
-//    };
-//    CFRunLoopObserverRef runloopObserver = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeWaiting, YES, 0, &callBack, &contex);
-//    CFRunLoopAddObserver(runloopRef, runloopObserver, kCFRunLoopCommonModes);
-//    CFRelease(runloopObserver);
+    CFRunLoopObserverContext contex = {
+        0,
+        (__bridge void *)self,
+        &CFRetain,
+        &CFRelease,
+        NULL
+    };
+    CFRunLoopObserverRef runloopObserver = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeWaiting, YES, 0, &callBack, &contex);
+    CFRunLoopAddObserver(runloopRef, runloopObserver, kCFRunLoopCommonModes);
+    CFRelease(runloopObserver);
     
-    
+}
+
+-(void)addTimerRunloop{
+    CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
     CFRunLoopTimerContext timeContex = {
         0,
         (__bridge void *)self,
@@ -57,29 +60,32 @@ typedef void(^runLoopBlock)();
         &CFRelease,
         NULL
     };
-
-  CFRunLoopTimerRef timeRef =  CFRunLoopTimerCreate(NULL, 0, 0, kCFRunLoopBeforeWaiting, 1, &TimerCallBack, &timeContex);
+    
+    CFRunLoopTimerRef timeRef =  CFRunLoopTimerCreate(NULL, 0, 0.01, kCFRunLoopBeforeWaiting, 1, &TimerCallBack, &timeContex);
     CFRunLoopAddTimer(runloopRef, timeRef, kCFRunLoopCommonModes);
     CFRelease(timeRef);
 }
 
-
-
 void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info){
     ViewController *vc = (__bridge ViewController*)info;
-    [vc.tasks enumerateObjectsUsingBlock:^(runLoopBlock obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        obj();
-    }];
-    
+    if (vc.tasks.count == 0) {
+        return;
+    }
+    runLoopBlock block = vc.tasks.firstObject;
+    block();
+    [vc.tasks removeObjectAtIndex:0];
 
 }
 
 void TimerCallBack(CFRunLoopTimerRef timer, void *info){
     ViewController *vc = (__bridge ViewController*)info;
-    [vc.tasks enumerateObjectsUsingBlock:^(runLoopBlock obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        obj();
-        
-    }];
+    if (vc.tasks.count == 0) {
+        return;
+    }
+    runLoopBlock block = vc.tasks.firstObject;
+    block();
+    [vc.tasks removeObjectAtIndex:0];
+   
 }
 
 - (void)viewDidLoad {
