@@ -106,19 +106,29 @@ void TimerCallBack(CFRunLoopTimerRef timer, void *info){
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellid];
     if (!cell) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellid];
+        [self setCell:cell indexpath:indexPath];
+    }else{
+        __weak typeof(self) wsf = self;
+        runLoopBlock block = ^{
+            
+            [wsf setCell:cell indexpath:indexPath];
+        };
+        [self.tasks addObject:block];
     }
-    runLoopBlock block = ^{
     
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                NSLog(@"-----%@",[NSThread currentThread]);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
-                });
-            });
-      
-    };
-    [self.tasks addObject:block];
     return cell;
+}
+
+-(void)setCell:(UITableViewCell*)cell indexpath:(NSIndexPath*)indexPath{
+    
+    //模拟耗时
+    NSLog(@"---satrtTime = %@",[NSDate date]);
+    int j = 0;
+    for (int i= 0; i<500; i++) {
+        j= j+ i;
+    }
+    cell.textLabel.text = [NSString stringWithFormat:@"%d",j];
+    NSLog(@"---endTime = %@",[NSDate date]);
 }
 
 - (void)didReceiveMemoryWarning {
